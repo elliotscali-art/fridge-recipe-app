@@ -4,13 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fridge to Fork — Turn your ingredients into great recipes</title>
-  <meta name="description" content="Snap a photo of your fridge and pantry. Fridge to Fork uses AI to scan your ingredients and find real, highly-rated recipes you can make right now." />
+  <meta name="description" content="You have a fridge full of food but no idea what to cook. Fridge to Fork fixes that in seconds — snap a photo, get 6 real recipes you can make right now." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
       --cream: #F5F0E8;
       --warm-white: #FAFAF7;
@@ -21,763 +20,431 @@
       --light: #9A9A92;
       --border: #E0DAD0;
     }
-
     html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--warm-white);
-      color: var(--charcoal);
-      font-family: 'DM Mono', monospace;
-      font-weight: 300;
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-    }
+    body { background: var(--warm-white); color: var(--charcoal); font-family: 'DM Mono', monospace; font-weight: 300; line-height: 1.6; -webkit-font-smoothing: antialiased; }
 
     /* ── Nav ── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 20px 40px;
-      background: rgba(250, 250, 247, 0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-logo {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 22px;
-      font-weight: 300;
-      color: var(--charcoal);
-      text-decoration: none;
-      letter-spacing: -0.02em;
-    }
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 20px 48px; background: rgba(250,250,247,0.94); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); }
+    .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 300; color: var(--charcoal); text-decoration: none; letter-spacing: -0.02em; }
     .nav-logo em { color: var(--red); font-style: italic; }
-    .nav-links { display: flex; align-items: center; gap: 32px; }
-    .nav-links a {
-      font-size: 10px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--mid);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
+    .nav-links { display: flex; align-items: center; gap: 36px; }
+    .nav-links a { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--mid); text-decoration: none; transition: color 0.2s; }
     .nav-links a:hover { color: var(--charcoal); }
-    .btn-nav {
-      font-size: 10px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      background: var(--charcoal);
-      color: var(--cream) !important;
-      padding: 10px 20px;
-      border-radius: 1px;
-      text-decoration: none;
-      transition: background 0.2s;
-    }
+    .btn-nav { background: var(--charcoal) !important; color: var(--cream) !important; padding: 10px 22px; border-radius: 1px; transition: background 0.2s !important; }
     .btn-nav:hover { background: var(--red) !important; }
-
-    /* ── Sections ── */
-    section { padding: 100px 40px; max-width: 1100px; margin: 0 auto; }
 
     /* ── Hero ── */
     .hero {
       min-height: 100vh;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 60px;
-      align-items: center;
-      padding-top: 140px;
-      max-width: 1100px;
-      margin: 0 auto;
-      padding-left: 40px;
-      padding-right: 40px;
-    }
-    .hero-eyebrow {
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--red);
-      margin-bottom: 16px;
-    }
-    .hero-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(48px, 6vw, 76px);
-      font-weight: 300;
-      line-height: 1.05;
-      letter-spacing: -0.03em;
-      margin-bottom: 24px;
-    }
-    .hero-title em { color: var(--red); font-style: italic; }
-    .hero-sub {
-      font-size: 13px;
-      color: var(--mid);
-      line-height: 1.8;
-      max-width: 420px;
-      margin-bottom: 40px;
-    }
-    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--charcoal);
-      color: var(--cream);
-      padding: 14px 28px;
-      font-family: 'DM Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      text-decoration: none;
-      border-radius: 1px;
-      transition: background 0.2s;
-    }
-    .btn-primary:hover { background: var(--red); }
-    .btn-secondary {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: transparent;
-      color: var(--mid);
-      padding: 14px 28px;
-      font-family: 'DM Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      text-decoration: none;
-      border: 1px solid var(--border);
-      border-radius: 1px;
-      transition: border-color 0.2s, color 0.2s;
-    }
-    .btn-secondary:hover { border-color: var(--charcoal); color: var(--charcoal); }
-    .hero-note {
-      margin-top: 20px;
-      font-size: 10px;
-      color: var(--light);
-      letter-spacing: 0.05em;
-    }
-
-    /* Phone mockup */
-    .phone-wrap {
+      position: relative;
       display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      position: relative;
+      align-items: center;
+      overflow: hidden;
     }
-    .phone {
-      width: 260px;
-      background: var(--charcoal);
-      border-radius: 36px;
-      padding: 14px;
-      box-shadow: 0 40px 80px rgba(28,28,26,0.2), 0 0 0 1px rgba(28,28,26,0.1);
-      position: relative;
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url('https://images.unsplash.com/photo-1606914501449-5a96b6ce24ca?w=1800&auto=format&fit=crop&q=80');
+      background-size: cover;
+      background-position: center 40%;
+      filter: brightness(0.45);
     }
-    .phone-notch {
-      width: 80px;
-      height: 24px;
-      background: var(--charcoal);
-      border-radius: 0 0 16px 16px;
-      margin: 0 auto 8px;
+    .hero-content {
       position: relative;
       z-index: 2;
+      max-width: 720px;
+      padding: 140px 80px 100px;
     }
-    .phone-screen {
-      background: var(--warm-white);
-      border-radius: 24px;
-      overflow: hidden;
-      min-height: 520px;
-    }
-    .screen-header {
-      background: var(--warm-white);
-      padding: 16px 14px 12px;
-      border-bottom: 1px solid var(--border);
-      text-align: center;
-    }
-    .screen-eyebrow {
-      font-size: 7px;
-      letter-spacing: 0.2em;
-      color: var(--red);
-      margin-bottom: 4px;
-    }
-    .screen-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 20px;
-      font-weight: 300;
-      color: var(--charcoal);
-    }
-    .screen-title em { color: var(--red); font-style: italic; }
-    .screen-progress {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 6px;
-      padding: 10px 14px;
-      border-bottom: 1px solid #F0EBE3;
-    }
-    .prog-dot { width: 6px; height: 6px; border-radius: 50%; }
-    .prog-line { width: 28px; height: 1px; background: var(--border); }
-    .prog-label { font-size: 6px; letter-spacing: 0.1em; }
-    .screen-body { padding: 12px; }
-    .screen-card {
-      background: var(--cream);
-      border: 1px solid var(--border);
-      border-radius: 2px;
-      padding: 12px;
-      margin-bottom: 8px;
-    }
-    .screen-card-title { font-family: 'Cormorant Garamond', serif; font-size: 14px; font-weight: 300; color: var(--charcoal); margin-bottom: 2px; }
-    .screen-card-sub { font-size: 7px; color: var(--light); letter-spacing: 0.05em; margin-bottom: 10px; }
-    .screen-photo-slot {
-      border: 1.5px dashed #C0BAB0;
-      border-radius: 2px;
-      padding: 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 6px;
-    }
-    .screen-photo-filled {
-      height: 60px;
-      background: linear-gradient(135deg, #3D6B4A22, #3D6B4A44);
-      border-radius: 2px;
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      border: 1px solid var(--border);
-      position: relative;
-      overflow: hidden;
-    }
-    .screen-photo-overlay {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      background: rgba(28,28,26,0.5);
-      padding: 3px 6px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .screen-photo-overlay span { font-size: 6px; color: white; letter-spacing: 0.05em; }
-    .screen-btn {
-      width: 100%;
-      background: var(--charcoal);
-      color: var(--cream);
-      padding: 8px;
-      text-align: center;
-      font-size: 7px;
-      letter-spacing: 0.1em;
-      border-radius: 1px;
-      margin-top: 8px;
-    }
-    .screen-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      background: var(--warm-white);
-      border: 1px solid var(--border);
-      border-radius: 1px;
-      padding: 3px 7px;
-      font-size: 7px;
-      color: var(--charcoal);
-      margin: 2px;
-    }
-    .tags-wrap { display: flex; flex-wrap: wrap; margin-bottom: 8px; }
-    .screen-recipe {
-      background: var(--cream);
-      border: 1px solid var(--border);
-      border-radius: 2px;
-      padding: 10px;
-      margin-bottom: 6px;
-    }
-    .screen-recipe-title { font-family: 'Cormorant Garamond', serif; font-size: 13px; color: var(--charcoal); margin-bottom: 4px; }
-    .screen-recipe-meta { display: flex; gap: 8px; margin-bottom: 6px; }
-    .screen-recipe-meta span { font-size: 6px; color: var(--light); }
-    .screen-match { height: 2px; background: var(--border); border-radius: 1px; overflow: hidden; }
-    .screen-match-fill { height: 100%; background: var(--green); }
-    .screen-cuisine { font-size: 6px; background: #EBF0EB; color: var(--green); padding: 2px 5px; border-radius: 1px; letter-spacing: 0.05em; }
+    .hero-eyebrow { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: #C8A07A; margin-bottom: 20px; }
+    .hero-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(52px, 7vw, 88px); font-weight: 300; line-height: 1.0; letter-spacing: -0.03em; color: white; margin-bottom: 28px; }
+    .hero-title em { color: #E8A87A; font-style: italic; }
+    .hero-sub { font-size: 14px; color: rgba(255,255,255,0.75); line-height: 1.9; max-width: 480px; margin-bottom: 44px; }
+    .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+    .btn-primary { display: inline-flex; align-items: center; gap: 10px; background: var(--red); color: white; padding: 16px 32px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; text-decoration: none; border-radius: 1px; transition: background 0.2s; }
+    .btn-primary:hover { background: #A8441F; }
+    .btn-ghost { display: inline-flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.12); color: white; padding: 16px 32px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; text-decoration: none; border: 1px solid rgba(255,255,255,0.3); border-radius: 1px; transition: background 0.2s; }
+    .btn-ghost:hover { background: rgba(255,255,255,0.2); }
+    .hero-scroll { position: absolute; bottom: 40px; left: 80px; z-index: 2; display: flex; align-items: center; gap: 12px; }
+    .hero-scroll span { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.4); }
+    .scroll-line { width: 40px; height: 1px; background: rgba(255,255,255,0.3); }
 
-    /* floating card */
-    .phone-float {
-      position: absolute;
-      right: -50px;
-      top: 180px;
-      width: 140px;
-      background: white;
-      border-radius: 12px;
-      padding: 14px;
-      box-shadow: 0 20px 40px rgba(28,28,26,0.12);
-      border: 1px solid var(--border);
-    }
-    .float-icon { font-size: 24px; margin-bottom: 6px; }
-    .float-label { font-size: 9px; color: var(--light); letter-spacing: 0.05em; margin-bottom: 2px; }
-    .float-value { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--charcoal); }
+    /* ── Problem section ── */
+    .problem { background: var(--charcoal); padding: 100px 80px; }
+    .problem-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+    .problem-eyebrow { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--red); margin-bottom: 20px; }
+    .problem-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(38px, 4vw, 56px); font-weight: 300; color: var(--cream); line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 32px; }
+    .problem-title em { color: #E8A87A; font-style: italic; }
+    .problem-list { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+    .problem-list li { display: flex; align-items: flex-start; gap: 16px; font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.7; }
+    .problem-list li::before { content: '—'; color: var(--red); flex-shrink: 0; margin-top: 2px; }
+    .problem-image { position: relative; }
+    .problem-image img { width: 100%; height: 500px; object-fit: cover; border-radius: 2px; filter: brightness(0.85); }
+    .problem-image-caption { position: absolute; bottom: 20px; left: 20px; right: 20px; background: rgba(28,28,26,0.8); backdrop-filter: blur(8px); padding: 16px 20px; border-radius: 1px; }
+    .problem-image-caption p { font-size: 11px; color: rgba(255,255,255,0.7); font-style: italic; }
 
-    /* ── Divider ── */
-    .divider {
-      height: 1px;
-      background: var(--border);
-      max-width: 1100px;
-      margin: 0 auto;
-    }
+    /* ── Solution ── */
+    .solution { padding: 120px 80px; max-width: 1100px; margin: 0 auto; }
+    .solution-eyebrow { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--red); margin-bottom: 20px; }
+    .solution-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(38px, 4vw, 56px); font-weight: 300; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 16px; max-width: 600px; }
+    .solution-sub { font-size: 13px; color: var(--mid); line-height: 1.9; max-width: 520px; margin-bottom: 60px; }
+    .steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 2px; overflow: hidden; }
+    .step { background: var(--cream); padding: 40px 32px; }
+    .step-num { font-family: 'Cormorant Garamond', serif; font-size: 56px; font-weight: 300; color: var(--border); line-height: 1; margin-bottom: 20px; }
+    .step-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 400; margin-bottom: 10px; }
+    .step-desc { font-size: 11px; color: var(--mid); line-height: 1.9; }
 
-    /* ── Steps ── */
-    .steps-eyebrow {
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--red);
-      margin-bottom: 16px;
-    }
-    .steps-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(36px, 4vw, 52px);
-      font-weight: 300;
-      letter-spacing: -0.02em;
-      margin-bottom: 60px;
-      max-width: 500px;
-    }
-    .steps-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 40px;
-    }
-    .step-num {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 64px;
-      font-weight: 300;
-      color: var(--border);
-      line-height: 1;
-      margin-bottom: 16px;
-    }
-    .step-icon { font-size: 32px; margin-bottom: 12px; }
-    .step-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 24px;
-      font-weight: 400;
-      margin-bottom: 10px;
-    }
-    .step-desc { font-size: 12px; color: var(--mid); line-height: 1.8; }
+    /* ── Inspiration grid ── */
+    .inspiration { background: var(--cream); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 100px 80px; }
+    .inspiration-inner { max-width: 1100px; margin: 0 auto; }
+    .inspiration-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 48px; flex-wrap: wrap; gap: 20px; }
+    .inspiration-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(36px, 4vw, 52px); font-weight: 300; line-height: 1.1; letter-spacing: -0.02em; max-width: 500px; }
+    .inspiration-sub { font-size: 11px; color: var(--mid); line-height: 1.8; max-width: 280px; text-align: right; }
+    .photo-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; grid-template-rows: 280px 280px; gap: 8px; }
+    .photo-item { position: relative; overflow: hidden; border-radius: 2px; }
+    .photo-item.tall { grid-row: span 2; }
+    .photo-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+    .photo-item:hover img { transform: scale(1.04); }
+    .photo-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(28,28,26,0.7) 0%, transparent 50%); opacity: 0; transition: opacity 0.3s; display: flex; align-items: flex-end; padding: 20px; }
+    .photo-item:hover .photo-overlay { opacity: 1; }
+    .photo-label { font-family: 'Cormorant Garamond', serif; font-size: 20px; color: white; font-weight: 300; }
+    .photo-cuisine { font-size: 9px; letter-spacing: 0.15em; color: rgba(255,255,255,0.6); text-transform: uppercase; display: block; margin-bottom: 4px; }
+
+    /* ── Proof bar ── */
+    .proof { padding: 60px 80px; border-bottom: 1px solid var(--border); }
+    .proof-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 40px; flex-wrap: wrap; }
+    .proof-stat { text-align: center; }
+    .proof-num { font-family: 'Cormorant Garamond', serif; font-size: 48px; font-weight: 300; color: var(--charcoal); line-height: 1; margin-bottom: 6px; }
+    .proof-label { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--light); }
+    .proof-divider { width: 1px; height: 60px; background: var(--border); }
+    .proof-quote { max-width: 420px; }
+    .proof-quote blockquote { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 300; font-style: italic; color: var(--charcoal); line-height: 1.5; margin-bottom: 12px; }
+    .proof-quote cite { font-size: 10px; color: var(--light); letter-spacing: 0.1em; font-style: normal; }
 
     /* ── Features ── */
-    .features-bg {
-      background: var(--cream);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 2px;
-      background: var(--border);
-      border: 1px solid var(--border);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-    .feature {
-      background: var(--cream);
-      padding: 36px;
-    }
+    .features { padding: 100px 80px; max-width: 1100px; margin: 0 auto; }
+    .features-eyebrow { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--red); margin-bottom: 20px; }
+    .features-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(36px, 4vw, 52px); font-weight: 300; letter-spacing: -0.02em; margin-bottom: 56px; max-width: 500px; }
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
     .feature-icon { font-size: 28px; margin-bottom: 16px; }
-    .feature-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 22px;
-      font-weight: 400;
-      margin-bottom: 8px;
-    }
-    .feature-desc { font-size: 11px; color: var(--mid); line-height: 1.8; }
+    .feature-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 400; margin-bottom: 10px; line-height: 1.2; }
+    .feature-desc { font-size: 11px; color: var(--mid); line-height: 1.9; }
 
-    /* ── Social proof ── */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-      border-radius: 2px;
-      overflow: hidden;
-      margin-top: 60px;
-    }
-    .stat {
-      background: var(--warm-white);
-      padding: 40px;
-      text-align: center;
-    }
-    .stat-num {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 52px;
-      font-weight: 300;
-      color: var(--charcoal);
-      line-height: 1;
-      margin-bottom: 8px;
-    }
-    .stat-label { font-size: 10px; color: var(--light); letter-spacing: 0.1em; text-transform: uppercase; }
+    /* ── Full bleed image ── */
+    .fullbleed { height: 520px; position: relative; overflow: hidden; }
+    .fullbleed img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.6); }
+    .fullbleed-content { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; flex-direction: column; padding: 40px; }
+    .fullbleed-quote { font-family: 'Cormorant Garamond', serif; font-size: clamp(32px, 5vw, 60px); font-weight: 300; font-style: italic; color: white; line-height: 1.2; max-width: 800px; margin-bottom: 16px; }
+    .fullbleed-sub { font-size: 11px; color: rgba(255,255,255,0.55); letter-spacing: 0.15em; text-transform: uppercase; }
 
     /* ── CTA ── */
-    .cta-section {
-      text-align: center;
-      background: var(--charcoal);
-      padding: 100px 40px;
-    }
-    .cta-inner { max-width: 600px; margin: 0 auto; }
-    .cta-eyebrow {
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--red);
-      margin-bottom: 20px;
-    }
-    .cta-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(42px, 5vw, 64px);
-      font-weight: 300;
-      color: var(--cream);
-      line-height: 1.1;
-      letter-spacing: -0.02em;
-      margin-bottom: 20px;
-    }
-    .cta-title em { color: var(--red); font-style: italic; }
-    .cta-sub { font-size: 12px; color: #9A9A92; line-height: 1.8; margin-bottom: 40px; }
-    .cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-    .btn-store {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      background: var(--cream);
-      color: var(--charcoal);
-      padding: 16px 28px;
-      border-radius: 2px;
-      text-decoration: none;
-      transition: background 0.2s;
-    }
+    .cta { background: var(--charcoal); padding: 120px 80px; text-align: center; }
+    .cta-inner { max-width: 680px; margin: 0 auto; }
+    .cta-eyebrow { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--red); margin-bottom: 24px; }
+    .cta-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(44px, 6vw, 72px); font-weight: 300; color: var(--cream); line-height: 1.05; letter-spacing: -0.03em; margin-bottom: 20px; }
+    .cta-title em { color: #E8A87A; font-style: italic; }
+    .cta-sub { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.9; margin-bottom: 48px; max-width: 480px; margin-left: auto; margin-right: auto; }
+    .cta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px; }
+    .btn-store { display: inline-flex; align-items: center; gap: 14px; background: var(--cream); color: var(--charcoal); padding: 18px 32px; border-radius: 2px; text-decoration: none; transition: background 0.2s; }
     .btn-store:hover { background: white; }
-    .btn-store-icon { font-size: 24px; }
-    .btn-store-text { text-align: left; }
-    .btn-store-sub { font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); display: block; }
-    .btn-store-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 400; display: block; }
+    .btn-store-icon { font-size: 26px; }
+    .btn-store-sub { font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mid); display: block; margin-bottom: 2px; }
+    .btn-store-name { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 400; display: block; }
+    .cta-note { font-size: 10px; color: rgba(255,255,255,0.25); letter-spacing: 0.08em; }
 
     /* ── Footer ── */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-    .footer-logo {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 18px;
-      font-weight: 300;
-      color: var(--charcoal);
-      text-decoration: none;
-    }
+    footer { border-top: 1px solid rgba(255,255,255,0.08); background: var(--charcoal); padding: 40px 80px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
+    .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 300; color: rgba(255,255,255,0.5); text-decoration: none; }
     .footer-logo em { color: var(--red); font-style: italic; }
-    .footer-links { display: flex; gap: 24px; }
-    .footer-links a {
-      font-size: 10px;
-      letter-spacing: 0.1em;
-      color: var(--light);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .footer-links a:hover { color: var(--charcoal); }
-    .footer-copy { font-size: 10px; color: var(--light); }
+    .footer-links { display: flex; gap: 28px; }
+    .footer-links a { font-size: 10px; letter-spacing: 0.1em; color: rgba(255,255,255,0.3); text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: rgba(255,255,255,0.7); }
+    .footer-copy { font-size: 10px; color: rgba(255,255,255,0.2); }
 
     /* ── Responsive ── */
-    @media (max-width: 768px) {
-      nav { padding: 16px 20px; }
+    @media (max-width: 900px) {
+      nav { padding: 16px 24px; }
       .nav-links { display: none; }
-      .hero {
-        grid-template-columns: 1fr;
-        padding-top: 100px;
-        padding-left: 20px;
-        padding-right: 20px;
-        text-align: center;
-        gap: 40px;
-      }
-      .hero-sub { margin: 0 auto 40px; }
-      .hero-actions { justify-content: center; }
-      .phone-float { display: none; }
-      section { padding: 60px 20px; }
-      .steps-grid { grid-template-columns: 1fr; gap: 32px; }
-      .features-grid { grid-template-columns: 1fr; }
-      .stats-grid { grid-template-columns: 1fr; }
-      footer { flex-direction: column; gap: 20px; text-align: center; padding: 40px 20px; }
-      .cta-section { padding: 60px 20px; }
+      .hero-content { padding: 120px 24px 80px; }
+      .hero-scroll { left: 24px; }
+      .problem { padding: 60px 24px; }
+      .problem-inner { grid-template-columns: 1fr; gap: 40px; }
+      .solution { padding: 60px 24px; }
+      .steps-grid { grid-template-columns: 1fr; }
+      .inspiration { padding: 60px 24px; }
+      .inspiration-header { flex-direction: column; }
+      .inspiration-sub { text-align: left; max-width: 100%; }
+      .photo-grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+      .photo-item.tall { grid-row: span 1; height: 240px; }
+      .photo-item { height: 200px; }
+      .proof { padding: 40px 24px; }
+      .proof-inner { flex-direction: column; align-items: flex-start; }
+      .proof-divider { width: 60px; height: 1px; }
+      .features { padding: 60px 24px; }
+      .features-grid { grid-template-columns: 1fr; gap: 32px; }
+      .fullbleed { height: 360px; }
+      .cta { padding: 80px 24px; }
+      footer { padding: 32px 24px; flex-direction: column; text-align: center; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Nav -->
-  <nav>
-    <a href="#" class="nav-logo">Fridge to <em>Fork</em></a>
-    <div class="nav-links">
-      <a href="#how-it-works">How it works</a>
-      <a href="#features">Features</a>
-      <a href="#download" class="btn-nav">Download app</a>
-    </div>
-  </nav>
+<!-- Nav -->
+<nav>
+  <a href="#" class="nav-logo">Fridge to <em>Fork</em></a>
+  <div class="nav-links">
+    <a href="#problem">The problem</a>
+    <a href="#how-it-works">How it works</a>
+    <a href="#download" class="btn-nav">Download free</a>
+  </div>
+</nav>
 
-  <!-- Hero -->
-  <div class="hero">
-    <div class="hero-text">
-      <div class="hero-eyebrow">AI Kitchen Assistant</div>
-      <h1 class="hero-title">
-        Turn your fridge<br>into <em>great meals</em>
-      </h1>
-      <p class="hero-sub">
-        Snap a photo of your fridge and pantry. Fridge to Fork uses AI to instantly identify your ingredients and find real, highly-rated recipes you can make right now — no shopping required.
-      </p>
-      <div class="hero-actions">
-        <a href="#download" class="btn-primary">
-          <span>↓</span> Download free
-        </a>
-        <a href="#how-it-works" class="btn-secondary">See how it works</a>
-      </div>
-      <p class="hero-note">Available on iOS &amp; Android &middot; Free to use</p>
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Fridge to Fork — AI Kitchen Assistant</div>
+    <h1 class="hero-title">
+      Your fridge<br>is full.<br><em>So why is dinner so hard?</em>
+    </h1>
+    <p class="hero-sub">
+      Snap a photo of your fridge and pantry. Fridge to Fork uses AI to instantly identify your ingredients and find real, highly-rated recipes you can make right now — no shopping trip required.
+    </p>
+    <div class="hero-actions">
+      <a href="#download" class="btn-primary">↓ Download free</a>
+      <a href="#problem" class="btn-ghost">See how it works</a>
     </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span>Scroll to explore</span>
+  </div>
+</div>
 
-    <div class="phone-wrap">
-      <!-- Phone mockup -->
-      <div class="phone">
-        <div class="phone-notch"></div>
-        <div class="phone-screen">
-          <div class="screen-header">
-            <div class="screen-eyebrow">AI KITCHEN ASSISTANT</div>
-            <div class="screen-title">Fridge to <em>Fork</em></div>
-          </div>
-          <div class="screen-progress">
-            <div class="prog-dot" style="background:#C8552A"></div>
-            <div class="prog-label" style="color:#C8552A">Photos</div>
-            <div class="prog-line"></div>
-            <div class="prog-dot" style="background:#E0DAD0"></div>
-            <div class="prog-label" style="color:#C0BAB0">Ingredients</div>
-            <div class="prog-line"></div>
-            <div class="prog-dot" style="background:#E0DAD0"></div>
-            <div class="prog-label" style="color:#C0BAB0">Recipes</div>
-          </div>
-          <div class="screen-body">
-            <div class="screen-card">
-              <div class="screen-card-title">Add your photos</div>
-              <div class="screen-card-sub">Up to 4 fridge + 4 pantry photos</div>
-              <div style="font-size:8px;font-weight:500;color:#5A5A54;margin-bottom:6px;letter-spacing:0.05em">🧊 Fridge <span style="float:right;color:#9A9A92">2/4</span></div>
-              <div class="screen-photo-filled">
-                🥬🧃🧀
-                <div class="screen-photo-overlay">
-                  <span>Fridge 1</span>
-                  <span>Replace · Remove</span>
-                </div>
-              </div>
-              <div class="screen-photo-filled">
-                🥕🍳🧈
-                <div class="screen-photo-overlay">
-                  <span>Fridge 2</span>
-                  <span>Replace · Remove</span>
-                </div>
-              </div>
-              <div class="screen-photo-slot">
-                <span style="font-size:14px">➕</span>
-                <div>
-                  <div style="font-size:8px;color:#1C1C1A">Add another fridge photo</div>
-                  <div style="font-size:7px;color:#9A9A92">Tap to choose from camera roll</div>
-                </div>
-              </div>
-              <div class="screen-btn">SCAN 2 PHOTOS →</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- Floating card -->
-      <div class="phone-float">
-        <div class="float-icon">✓</div>
-        <div class="float-label">Ingredients found</div>
-        <div class="float-value">24</div>
-        <div style="height:1px;background:#E0DAD0;margin:8px 0"></div>
-        <div class="float-label">Recipes ready</div>
-        <div class="float-value" style="color:#C8552A">6</div>
+<!-- Problem -->
+<div class="problem" id="problem">
+  <div class="problem-inner">
+    <div>
+      <div class="problem-eyebrow">Sound familiar?</div>
+      <h2 class="problem-title">You open the fridge.<br><em>Nothing</em> comes to mind.</h2>
+      <ul class="problem-list">
+        <li>You're staring at a full fridge and a full pantry — but you can't see a single meal in it.</li>
+        <li>You end up ordering takeout again, even though you have everything you need to cook something great.</li>
+        <li>Half of what you bought last week gets thrown away because you didn't know what to do with it.</li>
+        <li>You Google "recipes with chicken and courgette" and get overwhelmed by a hundred options — none of which match exactly what you have.</li>
+      </ul>
+    </div>
+    <div class="problem-image">
+      <img src="https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=800&auto=format&fit=crop&q=80" alt="Open fridge full of ingredients" />
+      <div class="problem-image-caption">
+        <p>"I know there's a great meal in there somewhere. I just can't see it."</p>
       </div>
     </div>
   </div>
+</div>
 
-  <div style="max-width:1100px;margin:0 auto;padding:0 40px"><div class="divider"></div></div>
-
-  <!-- How it works -->
-  <section id="how-it-works">
-    <div class="steps-eyebrow">How it works</div>
-    <h2 class="steps-title">Three steps to dinner</h2>
+<!-- Solution -->
+<div id="how-it-works">
+  <div class="solution">
+    <div class="solution-eyebrow">The solution</div>
+    <h2 class="solution-title">From fridge to fork in three steps</h2>
+    <p class="solution-sub">Fridge to Fork is an AI kitchen assistant that looks at what you actually have and finds real, delicious recipes you can cook right now.</p>
     <div class="steps-grid">
-      <div>
+      <div class="step">
         <div class="step-num">01</div>
-        <div class="step-icon">📸</div>
-        <div class="step-title">Snap your fridge</div>
-        <p class="step-desc">Take up to 4 photos of your fridge and 4 of your pantry. The more you show, the better the recipes.</p>
+        <div style="font-size:32px;margin-bottom:14px">📸</div>
+        <div class="step-title">Snap your fridge &amp; pantry</div>
+        <p class="step-desc">Take up to 8 photos — fridge shelves, pantry cupboards, spice racks. The more you show, the better the recipes.</p>
       </div>
-      <div>
+      <div class="step">
         <div class="step-num">02</div>
-        <div class="step-icon">🔍</div>
-        <div class="step-title">AI scans ingredients</div>
-        <p class="step-desc">Our AI vision instantly identifies every ingredient it can see — produce, condiments, leftovers, all of it. Edit the list if anything's off.</p>
+        <div style="font-size:32px;margin-bottom:14px">🔍</div>
+        <div class="step-title">AI scans every ingredient</div>
+        <p class="step-desc">Our vision AI identifies everything it can see — fresh produce, condiments, leftovers, packaging. Edit the list if anything's off.</p>
       </div>
-      <div>
+      <div class="step">
         <div class="step-num">03</div>
-        <div class="step-icon">🍽</div>
-        <div class="step-title">Cook great recipes</div>
-        <p class="step-desc">Get 6 real, highly-rated recipes matched to what you have. Filter by cuisine or cook time. Full step-by-step instructions included.</p>
+        <div style="font-size:32px;margin-bottom:14px">🍽</div>
+        <div class="step-title">Cook something great</div>
+        <p class="step-desc">Get 6 real recipes matched to your ingredients. Filter by cuisine or cook time. Full step-by-step method included.</p>
       </div>
     </div>
-  </section>
-
-  <div class="divider"></div>
-
-  <!-- Features -->
-  <div class="features-bg" id="features">
-    <section style="padding-top:80px;padding-bottom:80px">
-      <div class="steps-eyebrow">Features</div>
-      <h2 class="steps-title" style="margin-bottom:40px">Everything you need, nothing you don't</h2>
-      <div class="features-grid">
-        <div class="feature">
-          <div class="feature-icon">🤖</div>
-          <div class="feature-title">AI ingredient scanning</div>
-          <p class="feature-desc">Advanced vision AI identifies ingredients from your photos with remarkable accuracy — including fresh produce, condiments, leftovers, and packaged goods.</p>
-        </div>
-        <div class="feature">
-          <div class="feature-icon">⭐</div>
-          <div class="feature-title">Real, rated recipes</div>
-          <p class="feature-desc">Recipes sourced from across the internet — Allrecipes, BBC Good Food, Food Network and more — with real ratings and source links so you know they're tried and tested.</p>
-        </div>
-        <div class="feature">
-          <div class="feature-icon">🌍</div>
-          <div class="feature-title">Filter by cuisine &amp; time</div>
-          <p class="feature-desc">In the mood for Italian? Need dinner in under 30 minutes? Filter your recipe results instantly by cuisine type and cooking time.</p>
-        </div>
-        <div class="feature">
-          <div class="feature-icon">🔖</div>
-          <div class="feature-title">Save to your profile</div>
-          <p class="feature-desc">Create an account and save recipes you love. Build your personal cookbook from the dishes you've discovered and made.</p>
-        </div>
-        <div class="feature">
-          <div class="feature-icon">📊</div>
-          <div class="feature-title">Ingredient match score</div>
-          <p class="feature-desc">Each recipe shows exactly what percentage of ingredients you already have — and a clear list of the few things you'd need to pick up.</p>
-        </div>
-        <div class="feature">
-          <div class="feature-icon">🗑</div>
-          <div class="feature-title">Reduce food waste</div>
-          <p class="feature-desc">Use what's already in your fridge before it goes off. Fridge to Fork is the easiest way to stop throwing money in the bin.</p>
-        </div>
-      </div>
-    </section>
   </div>
+</div>
 
-  <!-- Stats -->
-  <section>
-    <div class="steps-eyebrow">By the numbers</div>
-    <h2 class="steps-title">Built for real home cooks</h2>
-    <div class="stats-grid">
-      <div class="stat">
-        <div class="stat-num">8</div>
-        <div class="stat-label">Photos per scan</div>
+<!-- Inspiration grid -->
+<div class="inspiration">
+  <div class="inspiration-inner">
+    <div class="inspiration-header">
+      <div>
+        <div class="solution-eyebrow">What you could be making</div>
+        <h2 class="inspiration-title">The meals hiding in your kitchen</h2>
       </div>
-      <div class="stat">
-        <div class="stat-num">6</div>
-        <div class="stat-label">Recipes per result</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num">~10s</div>
-        <div class="stat-label">Scan time</div>
-      </div>
+      <p class="inspiration-sub">Real recipes from real ingredients. Fridge to Fork finds dishes you'd never have thought of — from what you already have.</p>
     </div>
-  </section>
-
-  <div class="divider"></div>
-
-  <!-- Recipe preview -->
-  <section>
-    <div class="steps-eyebrow">Recipe results</div>
-    <h2 class="steps-title">See exactly what you can make</h2>
-    <div style="background:var(--cream);border:1px solid var(--border);border-radius:2px;padding:32px;max-width:480px">
-      <!-- Filter chips -->
-      <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
-        <div style="padding:6px 14px;background:var(--charcoal);border-radius:20px;font-size:10px;color:var(--cream);letter-spacing:0.05em">All cuisines</div>
-        <div style="padding:6px 14px;border:1px solid var(--border);border-radius:20px;font-size:10px;color:var(--mid);letter-spacing:0.05em">Italian</div>
-        <div style="padding:6px 14px;border:1px solid var(--border);border-radius:20px;font-size:10px;color:var(--mid);letter-spacing:0.05em">Asian</div>
-        <div style="padding:6px 14px;border:1px solid var(--border);border-radius:20px;font-size:10px;color:var(--mid);letter-spacing:0.05em">Mediterranean</div>
-      </div>
-      <!-- Recipe card 1 -->
-      <div style="background:var(--warm-white);border:1px solid var(--red);border-radius:2px;padding:16px;margin-bottom:8px">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
-          <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;flex:1">Spinach &amp; Feta Frittata</div>
-          <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0">
-            <div style="border:1px solid var(--border);padding:3px 8px;font-size:8px;color:var(--light);letter-spacing:1px">EASY</div>
-            <div style="background:#EBF0EB;padding:3px 8px;border-radius:2px;font-size:8px;color:var(--green);letter-spacing:0.5px">Mediterranean</div>
+    <div class="photo-grid">
+      <div class="photo-item tall">
+        <img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=900&auto=format&fit=crop&q=80" alt="Beautiful plated meal" />
+        <div class="photo-overlay">
+          <div>
+            <span class="photo-cuisine">Mediterranean</span>
+            <div class="photo-label">Summer vegetable tart</div>
           </div>
         </div>
-        <div style="font-size:11px;color:var(--mid);margin-bottom:10px">A simple, protein-rich frittata using eggs, spinach and feta — ready in under 20 minutes.</div>
-        <div style="display:flex;gap:16px;margin-bottom:10px">
-          <span style="font-size:10px;color:var(--light)">⏱ <span style="color:var(--charcoal)">5 min prep</span></span>
-          <span style="font-size:10px;color:var(--light)">🔥 <span style="color:var(--charcoal)">15 min cook</span></span>
-          <span style="font-size:10px;color:var(--light)">👥 <span style="color:var(--charcoal)">2 serves</span></span>
-        </div>
-        <div style="height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-bottom:4px">
-          <div style="width:92%;height:100%;background:var(--green)"></div>
-        </div>
-        <div style="font-size:9px;color:var(--green);letter-spacing:0.05em">92% ingredient match</div>
       </div>
-      <!-- Recipe card 2 -->
-      <div style="background:var(--cream);border:1px solid var(--border);border-radius:2px;padding:16px;margin-bottom:8px;opacity:0.7">
-        <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;margin-bottom:4px">Lemon Herb Roast Chicken</div>
-        <div style="display:flex;gap:8px;margin-bottom:8px">
-          <div style="border:1px solid var(--border);padding:3px 8px;font-size:8px;color:var(--light)">MEDIUM</div>
-          <div style="background:#EBF0EB;padding:3px 8px;border-radius:2px;font-size:8px;color:var(--green)">French</div>
+      <div class="photo-item">
+        <img src="https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=600&auto=format&fit=crop&q=80" alt="Pasta dish" />
+        <div class="photo-overlay">
+          <div>
+            <span class="photo-cuisine">Italian</span>
+            <div class="photo-label">Creamy pasta</div>
+          </div>
         </div>
-        <div style="height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-bottom:4px">
-          <div style="width:78%;height:100%;background:var(--green)"></div>
-        </div>
-        <div style="font-size:9px;color:var(--green)">78% ingredient match</div>
       </div>
-      <div style="font-size:10px;color:var(--light);text-align:center;padding-top:8px;letter-spacing:0.05em">+ 4 more recipes</div>
-    </div>
-  </section>
-
-  <!-- CTA -->
-  <div class="cta-section" id="download">
-    <div class="cta-inner">
-      <div class="cta-eyebrow">Download Fridge to Fork</div>
-      <h2 class="cta-title">Stop wondering.<br>Start <em>cooking</em>.</h2>
-      <p class="cta-sub">Free to download. Works with whatever's already in your kitchen.</p>
-      <div class="cta-btns">
-        <a href="#" class="btn-store">
-          <span class="btn-store-icon"></span>
-          <span class="btn-store-text">
-            <span class="btn-store-sub">Download on the</span>
-            <span class="btn-store-name">App Store</span>
-          </span>
-        </a>
-        <a href="#" class="btn-store">
-          <span class="btn-store-icon">▶</span>
-          <span class="btn-store-text">
-            <span class="btn-store-sub">Get it on</span>
-            <span class="btn-store-name">Google Play</span>
-          </span>
-        </a>
+      <div class="photo-item">
+        <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&auto=format&fit=crop&q=80" alt="Fresh salad" />
+        <div class="photo-overlay">
+          <div>
+            <span class="photo-cuisine">Asian</span>
+            <div class="photo-label">Sesame noodle salad</div>
+          </div>
+        </div>
+      </div>
+      <div class="photo-item">
+        <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&auto=format&fit=crop&q=80" alt="Pancakes" />
+        <div class="photo-overlay">
+          <div>
+            <span class="photo-cuisine">American</span>
+            <div class="photo-label">Fluffy breakfast stack</div>
+          </div>
+        </div>
+      </div>
+      <div class="photo-item">
+        <img src="https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=600&auto=format&fit=crop&q=80" alt="Curry dish" />
+        <div class="photo-overlay">
+          <div>
+            <span class="photo-cuisine">Indian</span>
+            <div class="photo-label">Fragrant curry</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Footer -->
-  <footer>
-    <a href="#" class="footer-logo">Fridge to <em>Fork</em></a>
-    <div class="footer-links">
-      <a href="#">Privacy</a>
-      <a href="#">Terms</a>
-      <a href="#">Contact</a>
+<!-- Full bleed quote -->
+<div class="fullbleed">
+  <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1800&auto=format&fit=crop&q=80" alt="Cooking in kitchen" />
+  <div class="fullbleed-content">
+    <p class="fullbleed-quote">"Stop throwing away food. Start cooking meals you're proud of."</p>
+    <span class="fullbleed-sub">Fridge to Fork — available free on iOS &amp; Android</span>
+  </div>
+</div>
+
+<!-- Proof bar -->
+<div class="proof">
+  <div class="proof-inner">
+    <div class="proof-stat">
+      <div class="proof-num">8</div>
+      <div class="proof-label">Photos per scan</div>
     </div>
-    <div class="footer-copy">© 2026 Fridge to Fork</div>
-  </footer>
+    <div class="proof-divider"></div>
+    <div class="proof-stat">
+      <div class="proof-num">6</div>
+      <div class="proof-label">Recipes per result</div>
+    </div>
+    <div class="proof-divider"></div>
+    <div class="proof-stat">
+      <div class="proof-num">~10s</div>
+      <div class="proof-label">Scan time</div>
+    </div>
+    <div class="proof-divider"></div>
+    <div class="proof-stat">
+      <div class="proof-num">0</div>
+      <div class="proof-label">Extra shopping needed</div>
+    </div>
+    <div class="proof-divider"></div>
+    <div class="proof-quote">
+      <blockquote>"I had no idea you could make so many different things from the same fridge."</blockquote>
+      <cite>— Early user, Sydney</cite>
+    </div>
+  </div>
+</div>
+
+<!-- Features -->
+<div class="features">
+  <div class="features-eyebrow">Built for real home cooks</div>
+  <h2 class="features-title">Everything you need, nothing you don't</h2>
+  <div class="features-grid">
+    <div>
+      <div class="feature-icon">🤖</div>
+      <div class="feature-title">AI that actually sees your food</div>
+      <p class="feature-desc">Advanced vision AI identifies ingredients from your photos with remarkable accuracy — fresh produce, condiments, leftovers and all.</p>
+    </div>
+    <div>
+      <div class="feature-icon">🌍</div>
+      <div class="feature-title">Filter by cuisine &amp; time</div>
+      <p class="feature-desc">Italian tonight? Need dinner in under 30 minutes? Filter results by cuisine and cook time to find exactly what you're in the mood for.</p>
+    </div>
+    <div>
+      <div class="feature-icon">📊</div>
+      <div class="feature-title">Know what you're missing</div>
+      <p class="feature-desc">Each recipe shows your ingredient match percentage — and a clear list of the few extras you'd need. No nasty surprises halfway through cooking.</p>
+    </div>
+    <div>
+      <div class="feature-icon">🔖</div>
+      <div class="feature-title">Save your favourites</div>
+      <p class="feature-desc">Create an account and save the recipes you love. Build your own personal cookbook from the dishes you've discovered.</p>
+    </div>
+    <div>
+      <div class="feature-icon">🗑</div>
+      <div class="feature-title">Cut food waste dramatically</div>
+      <p class="feature-desc">The average household throws away £700 of food per year. Fridge to Fork helps you use what you have before it goes off.</p>
+    </div>
+    <div>
+      <div class="feature-icon">⚡</div>
+      <div class="feature-title">Results in seconds</div>
+      <p class="feature-desc">From photo to recipe in under 10 seconds. No account required to get started — just open the app and point your camera.</p>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta" id="download">
+  <div class="cta-inner">
+    <div class="cta-eyebrow">Free to download</div>
+    <h2 class="cta-title">Open your fridge.<br><em>See dinner.</em></h2>
+    <p class="cta-sub">Stop staring at a full fridge and wondering what to cook. Fridge to Fork turns your ingredients into great meals — in seconds, for free.</p>
+    <div class="cta-btns">
+      <a href="#" class="btn-store">
+        <span class="btn-store-icon"></span>
+        <span class="btn-store-text">
+          <span class="btn-store-sub">Download on the</span>
+          <span class="btn-store-name">App Store</span>
+        </span>
+      </a>
+      <a href="#" class="btn-store">
+        <span class="btn-store-icon">▶</span>
+        <span class="btn-store-text">
+          <span class="btn-store-sub">Get it on</span>
+          <span class="btn-store-name">Google Play</span>
+        </span>
+      </a>
+    </div>
+    <p class="cta-note">Free to use &middot; iOS &amp; Android &middot; No account needed to get started</p>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <a href="#" class="footer-logo">Fridge to <em>Fork</em></a>
+  <div class="footer-links">
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="#">Contact</a>
+  </div>
+  <div class="footer-copy">© 2026 Fridge to Fork</div>
+</footer>
 
 </body>
 </html>
