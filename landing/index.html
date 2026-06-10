@@ -36,35 +36,81 @@
     /* ── Hero ── */
     .hero {
       min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       position: relative;
-      display: flex;
-      align-items: center;
       overflow: hidden;
     }
-    .hero-bg {
+    .hero-panel {
+      position: relative;
+      overflow: hidden;
+      min-height: 100vh;
+    }
+    .hero-panel img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .hero-panel-left img { filter: brightness(0.36); }
+    .hero-panel-right img { filter: brightness(0.7) saturate(1.1); }
+    .hero-panel-right::after {
+      content: '';
       position: absolute;
       inset: 0;
-      background-image: url('https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1800');
-      background-size: cover;
-      background-position: center 40%;
-      filter: brightness(0.45);
+      background: linear-gradient(to right, rgba(28,28,26,0.6) 0%, transparent 55%);
+      z-index: 1;
+    }
+    .hero-right-label {
+      position: absolute;
+      bottom: 52px;
+      right: 48px;
+      z-index: 2;
+      text-align: right;
+    }
+    .hero-right-label-tag { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.5); display: block; margin-bottom: 6px; }
+    .hero-right-label-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 300; color: white; font-style: italic; }
+    .hero-divider {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 5;
+      width: 44px;
+      height: 44px;
+      background: rgba(250,250,247,0.13);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.75);
+      font-size: 16px;
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      pointer-events: none;
     }
     .hero-content {
-      position: relative;
-      z-index: 2;
-      max-width: 720px;
-      padding: 140px 80px 100px;
+      padding: 140px 72px 100px;
+      max-width: 560px;
+      pointer-events: all;
     }
     .hero-eyebrow { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: #C8A07A; margin-bottom: 20px; }
-    .hero-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(52px, 7vw, 88px); font-weight: 300; line-height: 1.0; letter-spacing: -0.03em; color: white; margin-bottom: 28px; }
+    .hero-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(48px, 5vw, 80px); font-weight: 300; line-height: 1.0; letter-spacing: -0.03em; color: white; margin-bottom: 28px; }
     .hero-title em { color: #E8A87A; font-style: italic; }
-    .hero-sub { font-size: 14px; color: rgba(255,255,255,0.75); line-height: 1.9; max-width: 480px; margin-bottom: 44px; }
+    .hero-sub { font-size: 13px; color: rgba(255,255,255,0.72); line-height: 1.9; max-width: 400px; margin-bottom: 44px; }
     .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
     .btn-primary { display: inline-flex; align-items: center; gap: 10px; background: var(--red); color: white; padding: 16px 32px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; text-decoration: none; border-radius: 1px; transition: background 0.2s; }
     .btn-primary:hover { background: #A8441F; }
     .btn-ghost { display: inline-flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.12); color: white; padding: 16px 32px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; text-decoration: none; border: 1px solid rgba(255,255,255,0.3); border-radius: 1px; transition: background 0.2s; }
     .btn-ghost:hover { background: rgba(255,255,255,0.2); }
-    .hero-scroll { position: absolute; bottom: 40px; left: 80px; z-index: 2; display: flex; align-items: center; gap: 12px; }
+    .hero-scroll { position: absolute; bottom: 40px; left: 72px; z-index: 4; display: flex; align-items: center; gap: 12px; }
     .hero-scroll span { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.4); }
     .scroll-line { width: 40px; height: 1px; background: rgba(255,255,255,0.3); }
 
@@ -164,6 +210,10 @@
     @media (max-width: 900px) {
       nav { padding: 16px 24px; }
       .nav-links { display: none; }
+      .hero { grid-template-columns: 1fr; }
+      .hero-panel-right { display: none; }
+      .hero-divider { display: none; }
+      .hero-panel-left { min-height: 100vh; }
       .hero-content { padding: 120px 24px 80px; }
       .hero-scroll { left: 24px; }
       .problem { padding: 60px 24px; }
@@ -201,18 +251,34 @@
 
 <!-- Hero -->
 <div class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-content">
-    <div class="hero-eyebrow">Fridge to Fork — AI Kitchen Assistant</div>
-    <h1 class="hero-title">
-      Your fridge<br>is full.<br><em>So why is dinner so hard?</em>
-    </h1>
-    <p class="hero-sub">
-      Snap a photo of your fridge and pantry. Fridge to Fork uses AI to instantly identify your ingredients and find real, highly-rated recipes you can make right now — no shopping trip required.
-    </p>
-    <div class="hero-actions">
-      <a href="#download" class="btn-primary">↓ Download free</a>
-      <a href="#problem" class="btn-ghost">See how it works</a>
+  <!-- Left panel: full fridge -->
+  <div class="hero-panel hero-panel-left">
+    <img src="https://images.pexels.com/photos/4397290/pexels-photo-4397290.jpeg?auto=compress&cs=tinysrgb&w=1200" alt="Fridge stocked with fresh ingredients" />
+  </div>
+  <!-- Right panel: finished meal -->
+  <div class="hero-panel hero-panel-right">
+    <img src="https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1200" alt="Beautiful plated meal" />
+    <div class="hero-right-label">
+      <span class="hero-right-label-tag">The result</span>
+      <span class="hero-right-label-title">Dinner, sorted.</span>
+    </div>
+  </div>
+  <!-- Arrow connector -->
+  <div class="hero-divider">→</div>
+  <!-- Text overlay (sits over left panel) -->
+  <div class="hero-overlay">
+    <div class="hero-content">
+      <div class="hero-eyebrow">Fridge to Fork — AI Kitchen Assistant</div>
+      <h1 class="hero-title">
+        Your fridge<br>is full.<br><em>So why is<br>dinner so hard?</em>
+      </h1>
+      <p class="hero-sub">
+        Snap a photo of your fridge and pantry. Fridge to Fork uses AI to instantly identify your ingredients and suggest recipes you can make right now — no shopping trip required.
+      </p>
+      <div class="hero-actions">
+        <a href="#download" class="btn-primary">↓ Download free</a>
+        <a href="#problem" class="btn-ghost">See how it works</a>
+      </div>
     </div>
   </div>
   <div class="hero-scroll">
