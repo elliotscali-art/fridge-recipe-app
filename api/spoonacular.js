@@ -4,20 +4,33 @@ export default async function handler(req, res) {
   const apiKey = process.env.SPOONACULAR_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'SPOONACULAR_API_KEY not set' });
 
-  const { ingredients } = req.body;
+  const { ingredients, mealType } = req.body;
   if (!ingredients || !ingredients.length) return res.status(400).json({ error: 'No ingredients provided' });
 
-  // Step 1: find recipes that match the ingredients
-  const findRes = await fetch(
-    'https://api.spoonacular.com/recipes/findByIngredients' +
-    '?ingredients=' + encodeURIComponent(ingredients.join(',')) +
-    '&number=6&ranking=2&ignorePantry=true&apiKey=' + apiKey
-  );
-  const found = await findRes.json();
+  // Map meal type to Spoonacular type parameter
+  const mealTypeMap = { Breakfast: 'breakfast', Lunch: 'main course,soup,salad', Dinner: 'main course', Snack: 'snack,appetizer' };
+  const spoonacularType = mealType && mealTypeMap[mealType];
 
-  if (!findRes.ok || !Array.isArray(found)) {
-    return res.status(500).json({ error: 'Spoonacular search failed', detail: found });
+  // Step 1: find recipes that match the ingredients (+ meal type if specified)
+  var searchUrl = spoonacularType
+    ? 'https://api.spoonacular.com/recipes/complexSearch' +
+      '?includeIngredients=' + encodeURIComponent(ingredients.join(',')) +
+      '&type=' + encodeURIComponent(spoonacularType) +
+      '&number=6&sort=min-missing-ingredients&addRecipeInformation=false&apiKey=' + apiKey
+    : 'https://api.spoonacular.com/recipes/findByIngredients' +
+      '?ingredients=' + encodeURIComponent(ingredients.join(',')) +
+      '&number=6&ranking=2&ignorePantry=true&apiKey=' + apiKey;
+
+  const findRes = await fetch(searchUrl);
+  const findData = await findRes.json();
+
+  if (!findRes.ok) {
+    return res.status(500).json({ error: 'Spoonacular search failed', detail: findData });
   }
+
+  // Normalise result shape — complexSearch returns { results: [...] }, findByIngredients returns [...]
+  const found = spoonacularType ? (findData.results || []) : findData;
+  if (!Array.isArray(found)) return res.status(500).json({ error: 'Unexpected Spoonacular response' });
 
   if (found.length === 0) {
     return res.status(200).json({ recipes: [] });
