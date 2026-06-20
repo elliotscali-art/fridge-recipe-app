@@ -47,7 +47,7 @@ export default async function handler(req, res) {
       return { stepNumber: s.number, instruction: s.step };
     });
 
-    var cuisine = (info.cuisines && info.cuisines[0]) || (info.dishTypes && info.dishTypes[0]) || null;
+    var cuisine = (info.cuisines && info.cuisines[0]) || null;
     if (cuisine) cuisine = cuisine.charAt(0).toUpperCase() + cuisine.slice(1);
 
     var rawSummary = (info.summary || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
