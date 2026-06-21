@@ -68,15 +68,6 @@ export default async function handler(req, res) {
       const d = await r.json();
       if (!r.ok) return res.status(500).json({ error: 'Spoonacular search failed', detail: d });
       found = Array.isArray(d) ? d : [];
-      // Get total count separately
-      const countRes = await fetch(
-        'https://api.spoonacular.com/recipes/complexSearch?includeIngredients=' +
-        encodeURIComponent(ingredients.join(',')) + '&number=1&apiKey=' + apiKey
-      ).catch(() => null);
-      if (countRes?.ok) {
-        const countData = await countRes.json().catch(() => ({}));
-        totalResults = countData.totalResults || null;
-      }
     }
   } else {
     return res.status(400).json({ error: 'Provide ingredients or a search query' });
@@ -95,12 +86,14 @@ export default async function handler(req, res) {
 
   var userNorms = (ingredients || []).map(normalise);
 
-  // Fetch full recipe info in parallel (max 12 at once)
-  const recipes = await Promise.all(found.map(async function(r) {
-    const infoRes = await fetch(
-      'https://api.spoonacular.com/recipes/' + r.id + '/information?includeNutrition=false&apiKey=' + apiKey
-    );
-    const info = await infoRes.json();
+  // Fetch full recipe info in parallel — individual failures are skipped, not fatal
+  const recipeResults = await Promise.all(found.map(async function(r) {
+    try {
+      const infoRes = await fetch(
+        'https://api.spoonacular.com/recipes/' + r.id + '/information?includeNutrition=false&apiKey=' + apiKey
+      );
+      if (!infoRes.ok) return null;
+      const info = await infoRes.json();
 
     // Steps
     var steps = ((info.analyzedInstructions || [])[0]?.steps || []).map(function(s) {
@@ -170,8 +163,12 @@ export default async function handler(req, res) {
       missingIngredients: missingIng,
       steps,
     };
+    } catch (e) {
+      return null;
+    }
   }));
 
+  const recipes = recipeResults.filter(Boolean);
   res.status(200).json({ recipes, totalResults });
 }
 
