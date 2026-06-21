@@ -15,128 +15,95 @@ export default async function handler(req, res) {
   };
   const spoonacularType = mealType && mealType !== 'Surprise me' ? mealTypeMap[mealType] : null;
 
-  var found = [];
-  var totalResults = null;
+  // Helper
+  function normalise(s) { return (s || '').toLowerCase().replace(/[^a-z0-9 ]/g, '').trim(); }
+  function isUsed(recipeIngName, userNorms) {
+    var n = normalise(recipeIngName);
+    return userNorms.some(function(u) { return u && (n.includes(u) || u.includes(n)); });
+  }
+  var userNorms = (ingredients || []).map(normalise).filter(Boolean);
 
-  // ── Search mode (text query) ──
-  if (query || (!ingredients?.length && (cuisine || diet || maxReadyTime))) {
-    var params = new URLSearchParams({
-      number: limit,
-      addRecipeInformation: 'false',
-      apiKey,
-    });
-    if (query) params.set('query', query);
-    if (cuisine) params.set('cuisine', cuisine.toLowerCase());
-    if (maxReadyTime) params.set('maxReadyTime', maxReadyTime);
-    if (diet) params.set('diet', diet);
-    if (spoonacularType) params.set('type', spoonacularType);
+  // ── Build a single complexSearch request — addRecipeInformation+fillIngredients
+  // returns everything in ONE API call instead of N+1
+  var params = new URLSearchParams({
+    number: limit,
+    addRecipeInformation: 'true',
+    fillIngredients: 'true',
+    addRecipeNutrition: 'false',
+    apiKey,
+  });
 
-    const searchRes = await fetch('https://api.spoonacular.com/recipes/complexSearch?' + params);
-    const searchData = await searchRes.json();
-    if (!searchRes.ok) return res.status(500).json({ error: 'Spoonacular search failed', detail: searchData });
-    found = searchData.results || [];
-    totalResults = searchData.totalResults || null;
-
-  // ── Ingredient scan mode ──
-  } else if (ingredients?.length) {
-    // Always use findByIngredients for ingredient matching — it returns usedIngredients + missedIngredients
-    // Then optionally filter by meal type in a second step via complexSearch
-    if (spoonacularType) {
-      // complexSearch with includeIngredients + meal type filter
-      var params2 = new URLSearchParams({
-        includeIngredients: ingredients.join(','),
-        type: spoonacularType,
-        number: limit,
-        sort: 'min-missing-ingredients',
-        fillIngredients: 'true',
-        addRecipeInformation: 'false',
-        apiKey,
-      });
-      if (cuisine) params2.set('cuisine', cuisine.toLowerCase());
-      const r2 = await fetch('https://api.spoonacular.com/recipes/complexSearch?' + params2);
-      const d2 = await r2.json();
-      if (!r2.ok) return res.status(500).json({ error: 'Spoonacular search failed', detail: d2 });
-      found = d2.results || [];
-      totalResults = d2.totalResults || null;
-    } else {
-      // findByIngredients — best for ingredient matching
-      const r = await fetch(
-        'https://api.spoonacular.com/recipes/findByIngredients?ingredients=' +
-        encodeURIComponent(ingredients.join(',')) +
-        '&number=' + limit + '&ranking=1&ignorePantry=true&apiKey=' + apiKey
-      );
-      const d = await r.json();
-      if (!r.ok) return res.status(500).json({ error: 'Spoonacular search failed', detail: d });
-      found = Array.isArray(d) ? d : [];
-    }
-  } else {
+  if (query) {
+    params.set('query', query);
+  } else if (ingredients && ingredients.length) {
+    params.set('includeIngredients', ingredients.join(','));
+    params.set('sort', 'min-missing-ingredients');
+  } else if (!cuisine && !diet && !maxReadyTime) {
     return res.status(400).json({ error: 'Provide ingredients or a search query' });
   }
 
-  if (found.length === 0) return res.status(200).json({ recipes: [], totalResults });
+  if (spoonacularType) params.set('type', spoonacularType);
+  if (cuisine) params.set('cuisine', cuisine.toLowerCase());
+  if (maxReadyTime) params.set('maxReadyTime', maxReadyTime);
+  if (diet) params.set('diet', diet);
 
-  // Normalise ingredient name for fuzzy matching
-  function normalise(s) { return (s || '').toLowerCase().replace(/[^a-z0-9 ]/g, '').trim(); }
+  const searchRes = await fetch('https://api.spoonacular.com/recipes/complexSearch?' + params);
+  const searchData = await searchRes.json();
 
-  // Whether a recipe ingredient name is covered by the user's list
-  function isUsed(recipeIngName, userNorms) {
-    var n = normalise(recipeIngName);
-    return userNorms.some(function(u) { return n.includes(u) || u.includes(n); });
+  if (!searchRes.ok) {
+    return res.status(500).json({
+      error: 'Spoonacular search failed',
+      detail: searchData.message || searchData.status || JSON.stringify(searchData).slice(0, 200),
+    });
   }
 
-  var userNorms = (ingredients || []).map(normalise);
+  const found = searchData.results || [];
+  if (found.length === 0) return res.status(200).json({ recipes: [] });
 
-  // Fetch full recipe info in parallel — individual failures are skipped, not fatal
-  const recipeResults = await Promise.all(found.map(async function(r) {
-    try {
-      const infoRes = await fetch(
-        'https://api.spoonacular.com/recipes/' + r.id + '/information?includeNutrition=false&apiKey=' + apiKey
-      );
-      if (!infoRes.ok) return null;
-      const info = await infoRes.json();
-
+  // Map each result — all info is already embedded via addRecipeInformation
+  const recipes = found.map(function(r) {
     // Steps
-    var steps = ((info.analyzedInstructions || [])[0]?.steps || []).map(function(s) {
+    var steps = ((r.analyzedInstructions || [])[0]?.steps || []).map(function(s) {
       return { stepNumber: s.number, instruction: s.step };
     });
 
     // Cuisine
-    var cuisineVal = (info.cuisines && info.cuisines[0]) || null;
+    var cuisineVal = (r.cuisines && r.cuisines[0]) || null;
     if (cuisineVal) cuisineVal = cuisineVal.charAt(0).toUpperCase() + cuisineVal.slice(1);
 
     // Description
-    var rawSummary = (info.summary || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+    var rawSummary = (r.summary || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
     var description = rawSummary.length > 220 ? rawSummary.slice(0, 220) + '…' : rawSummary;
 
     // Time
-    var totalMins = info.readyInMinutes || null;
-    var prepTime = info.preparationMinutes > 0 ? info.preparationMinutes + ' min' : null;
-    var cookTime = info.cookingMinutes > 0 ? info.cookingMinutes + ' min' : null;
+    var totalMins = r.readyInMinutes || null;
+    var prepTime = r.preparationMinutes > 0 ? r.preparationMinutes + ' min' : null;
+    var cookTime = r.cookingMinutes > 0 ? r.cookingMinutes + ' min' : null;
     if (!prepTime && !cookTime && totalMins) {
       prepTime = Math.round(totalMins * 0.35) + ' min';
       cookTime = Math.round(totalMins * 0.65) + ' min';
     }
 
     // Image
-    var image = r.image || info.image || null;
+    var image = r.image || null;
     if (image && !image.startsWith('http')) image = 'https://spoonacular.com/recipeImages/' + image;
 
     // Difficulty
-    var difficulty = totalMins <= 20 ? 'Easy' : totalMins <= 45 ? 'Medium' : 'Advanced';
+    var difficulty = !totalMins || totalMins <= 20 ? 'Easy' : totalMins <= 45 ? 'Medium' : 'Advanced';
 
-    // Stars: spoonacularScore is 0–100; convert to 1–5 half-star precision
-    var score = info.spoonacularScore ? Math.round(info.spoonacularScore) : null;
-    var stars = score ? Math.round((score / 20) * 2) / 2 : null; // e.g. 80 → 4.0
+    // Stars
+    var score = r.spoonacularScore ? Math.round(r.spoonacularScore) : null;
+    var stars = score ? Math.round((score / 20) * 2) / 2 : null;
 
     // Ingredient matching
+    // fillIngredients gives usedIngredients + missedIngredients when includeIngredients used
     var usedIng, missingIng;
     if (r.usedIngredients && r.missedIngredients) {
-      // findByIngredients path — trust the API
       usedIng = r.usedIngredients.map(function(i) { return i.name; });
       missingIng = r.missedIngredients.map(function(i) { return i.name; });
     } else {
-      // complexSearch path — compute from extendedIngredients using fuzzy match
-      var extIngs = (info.extendedIngredients || []).map(function(i) { return i.name || i.originalName || ''; });
+      // Text search path — fuzzy match against extendedIngredients
+      var extIngs = (r.extendedIngredients || []).map(function(i) { return i.name || i.originalName || ''; });
       if (userNorms.length) {
         usedIng = extIngs.filter(function(n) { return isUsed(n, userNorms); });
         missingIng = extIngs.filter(function(n) { return !isUsed(n, userNorms); });
@@ -148,13 +115,13 @@ export default async function handler(req, res) {
 
     return {
       id: r.id,
-      title: info.title || r.title,
+      title: r.title,
       description,
       cuisine: cuisineVal,
       prepTime: prepTime || '—',
       cookTime: cookTime || '—',
       totalTimeMinutes: totalMins,
-      servings: info.servings || 2,
+      servings: r.servings || 2,
       difficulty,
       image,
       score,
@@ -163,13 +130,9 @@ export default async function handler(req, res) {
       missingIngredients: missingIng,
       steps,
     };
-    } catch (e) {
-      return null;
-    }
-  }));
+  });
 
-  const recipes = recipeResults.filter(Boolean);
-  res.status(200).json({ recipes, totalResults });
+  res.status(200).json({ recipes });
 }
 
 export const config = { api: { bodyParser: true } };
