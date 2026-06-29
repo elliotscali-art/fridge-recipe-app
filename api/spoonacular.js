@@ -5,7 +5,7 @@ export default async function handler(req, res) {
   if (!apiKey) return res.status(500).json({ error: 'SPOONACULAR_API_KEY not set' });
 
   const { ingredients, mealType, query, cuisine, maxReadyTime, diet, number } = req.body;
-  const limit = Math.min(number || 12, 18);
+  const limit = Math.min(number || 8, 12);
 
   const mealTypeMap = {
     Breakfast: 'breakfast',
@@ -47,8 +47,18 @@ export default async function handler(req, res) {
   if (maxReadyTime) params.set('maxReadyTime', maxReadyTime);
   if (diet) params.set('diet', diet);
 
-  const searchRes = await fetch('https://api.spoonacular.com/recipes/complexSearch?' + params);
-  const searchData = await searchRes.json();
+  const controller = new AbortController();
+  const timeout = setTimeout(function() { controller.abort(); }, 20000);
+
+  let searchRes, searchData;
+  try {
+    searchRes = await fetch('https://api.spoonacular.com/recipes/complexSearch?' + params, { signal: controller.signal });
+    searchData = await searchRes.json();
+  } catch (err) {
+    clearTimeout(timeout);
+    return res.status(504).json({ error: 'Spoonacular request timed out — try fewer ingredients' });
+  }
+  clearTimeout(timeout);
 
   if (!searchRes.ok) {
     return res.status(500).json({
