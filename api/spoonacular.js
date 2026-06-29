@@ -47,18 +47,13 @@ export default async function handler(req, res) {
   if (maxReadyTime) params.set('maxReadyTime', maxReadyTime);
   if (diet) params.set('diet', diet);
 
-  const controller = new AbortController();
-  const timeout = setTimeout(function() { controller.abort(); }, 20000);
-
   let searchRes, searchData;
   try {
-    searchRes = await fetch('https://api.spoonacular.com/recipes/complexSearch?' + params, { signal: controller.signal });
+    searchRes = await fetch('https://api.spoonacular.com/recipes/complexSearch?' + params);
     searchData = await searchRes.json();
   } catch (err) {
-    clearTimeout(timeout);
-    return res.status(504).json({ error: 'Spoonacular request timed out — try fewer ingredients' });
+    return res.status(504).json({ error: 'Could not reach Spoonacular — try again in a moment' });
   }
-  clearTimeout(timeout);
 
   if (!searchRes.ok) {
     return res.status(500).json({
